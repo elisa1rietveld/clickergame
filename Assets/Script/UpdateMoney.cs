@@ -19,8 +19,7 @@ public class UpdateMoney : MonoBehaviour
     private int clickValue;
     public TMP_Text priceText1;
     public TMP_Text priceText2;
-    public ParticleSystem accessoryParticleSystem; // Add a reference to the particle system
-
+    public ParticleSystem accessoryParticleSystem; 
     // Start is called before the first frame update
     void Start()
     {
@@ -40,7 +39,7 @@ public class UpdateMoney : MonoBehaviour
         priceText1.text = "Toy cost: " + basePrices[0];
         priceText2.text = "Toy cost: " + basePrices[1];
 
-        // Ensure the particle system is stopped at the start
+        //ensure the particle system is stopped at the start
         if (accessoryParticleSystem != null)
         {
             accessoryParticleSystem.Stop();
@@ -54,6 +53,8 @@ public class UpdateMoney : MonoBehaviour
         UpdatePriceText();
     }
 
+
+    //if you have enough money, you can click on the button
     private void UpdateButtonInteractivity()
     {
         for (int i = 0; i < currentPrices.Length; i++)
@@ -69,12 +70,18 @@ public class UpdateMoney : MonoBehaviour
         }
     }
 
+    //add money by clicking meow
     public void AddMoney()
     {
-        money += clickValue; // Add current click value to money
+        money += clickValue; //add current click value to money
         moneyText.text = "Money: " + money;
     }
 
+
+    //cost gets subtracted
+    // we add an toy based on the number of the object in the array
+    //we add the toy via AddUPgrade
+    //if statement that add the right upgrade
     public void Buy(int num)
     {
         if (money >= currentPrices[num])
@@ -85,7 +92,7 @@ public class UpdateMoney : MonoBehaviour
             {
                 AddUpgrade(choice, num);
 
-                // Play the particle system
+                //play the particle system
                 if (accessoryParticleSystem != null)
                 {
                     PlayParticleSystem();
@@ -100,23 +107,24 @@ public class UpdateMoney : MonoBehaviour
                 Debug.LogError("Accessories is null");
             }
 
-            // Adjust click value based on the toy bought
+            //adjust click value based on the toy bought
             if (num == 0) // First toy
             {
                 clickValue += 1;
-                currentPrices[0] *= 2; // Double the price of the first toy
+                currentPrices[0] *= 2; //double the price of the first toy
                 if (priceText1 != null)
                 {
                     priceText1.text = "Toy cost: " + currentPrices[0];
                 }
             }
-            else if (num == 1) // Second toy
+            else if (num == 1) //second toy
             {
+                //first upgrade starts factory
                 if (choice.transform.childCount == 1)
                 {
                     StartCoroutine(ClickFactory());
                 }
-                currentPrices[1] *= 3; // Triple the price of the second toy
+                currentPrices[1] *= 3; //triple the price of the second toy
                 if (priceText2 != null)
                 {
                     priceText2.text = "Toy cost: " + currentPrices[1];
@@ -141,6 +149,7 @@ public class UpdateMoney : MonoBehaviour
 
     void AddUpgrade(GameObject choice, int num)
     {
+        //spawns prefab and sets it slightly above it's sibling
         GameObject upgrade = Instantiate(upgrades[num], new Vector2(0f, 0f), quaternion.identity);
         float Offset = choice.transform.childCount * 10f;
         upgrade.transform.SetParent(choice.transform, true);
@@ -149,6 +158,8 @@ public class UpdateMoney : MonoBehaviour
         upgrade.transform.localScale = new Vector3(1f, 1f, 1f);
     }
 
+    //once started, keeps looping and adding score after one second.
+    //amount is based on amount of siblings of the sprite.
     private IEnumerator ClickFactory()
     {
         while (true)
