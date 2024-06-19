@@ -80,15 +80,10 @@ public class UpdateMoney : MonoBehaviour
         if (money >= currentPrices[num])
         {
             money -= currentPrices[num];
+            GameObject choice = accessories.transform.GetChild(num).gameObject;
             if (accessories != null)
             {
-                GameObject choice = accessories.transform.GetChild(num).gameObject;
-                GameObject upgrade = Instantiate(upgrades[num], new Vector2(0f,0f), quaternion.identity);
-                float Offset = choice.transform.childCount * 10f;
-                upgrade.transform.SetParent(choice.transform, true);
-                upgrade.transform.SetAsFirstSibling();
-                upgrade.transform.localPosition = new Vector2(0f, Offset);
-                upgrade.transform.localScale = new Vector3(1f, 1f, 1f);
+                AddUpgrade(choice, num);
 
                 // Play the particle system
                 if (accessoryParticleSystem != null)
@@ -117,7 +112,10 @@ public class UpdateMoney : MonoBehaviour
             }
             else if (num == 1) // Second toy
             {
-                clickValue *= 2;
+                if (choice.transform.childCount == 1)
+                {
+                    StartCoroutine(ClickFactory());
+                }
                 currentPrices[1] *= 3; // Triple the price of the second toy
                 if (priceText2 != null)
                 {
@@ -139,5 +137,26 @@ public class UpdateMoney : MonoBehaviour
     private void PlayParticleSystem()
     {
         accessoryParticleSystem.Play();
+    }
+
+    void AddUpgrade(GameObject choice, int num)
+    {
+        GameObject upgrade = Instantiate(upgrades[num], new Vector2(0f, 0f), quaternion.identity);
+        float Offset = choice.transform.childCount * 10f;
+        upgrade.transform.SetParent(choice.transform, true);
+        upgrade.transform.SetAsFirstSibling();
+        upgrade.transform.localPosition = new Vector2(0f, Offset);
+        upgrade.transform.localScale = new Vector3(1f, 1f, 1f);
+    }
+
+    private IEnumerator ClickFactory()
+    {
+        while (true)
+        {
+            int count = accessories.transform.GetChild(1).childCount;
+            yield return new WaitForSeconds(1);
+            money += count;
+            moneyText.text = "Money: " + money;
+        }
     }
 }
